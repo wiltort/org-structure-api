@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.core.config import settings
-# from app.routes.posts import router as posts_router
+from app.routes.posts import router as posts_router
 from app.core.database import Base, engine
 
 
