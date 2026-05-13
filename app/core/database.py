@@ -5,7 +5,7 @@ from app.core.config import settings
 
 engine = create_engine(settings.database_url)
 SessionLocal = sessionmaker(
-    bind=sync_engine,
+    bind=engine,
     autocommit=False,
     autoflush=False,
 )
