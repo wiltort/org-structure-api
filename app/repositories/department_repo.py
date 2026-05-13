@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, aliased
 from app.models.departments import Department, Employee
-from datetime import datetime
+from datetime import date, datetime
 from app.core.config import settings
 
 
@@ -31,53 +31,25 @@ class DepartamentRepository:
         db.refresh(department)
         return department
 
-# перенести в сервис
-    @classmethod
-    def get_children_tree(
-        cls,
-        db: Session,
-        parent_id: int,
-        depth: int = 1
-    ) -> list[dict[str, any]]:
-        children = db.query(Department).filter(Department.parent_id == parent_id).all()
-        result = []
-        if depth <= 1:
-            for child in children:
-                result.append({
-                    'id': child.id,
-                    'name': child.name,
-                    'created_at': child.created_at,    
-                })
-            return result
-        for child in children:
-            result.append({
-                'id': child.id,
-                'name': child.name,
-                'created_at': child.created_at,
-                'children': cls.get_children_tree(db, child.id, depth-1),
-            })
-        return result
+    @staticmethod
+    def update(db: Session, department: Department, **kwargs) -> Department:
+        for key, value in kwargs.items():
+            setattr(department, key, value)
+        db.commit()
+        db.refresh(department)
+        return department
+    
+    @staticmethod
+    def delete(db: Session, department_id: int) -> None:
+        db.delete(db.query(Department).get(department_id))
+        db.commit()
 
-    @classmethod
-    def get_tree_and_employees(
-        cls,
+    @staticmethod
+    def add_employee(
         db: Session,
         department_id: int,
-        depth: int = 1,
-        include_employees: bool = False,
-    ) -> dict[str, any] | None:
-        
-        department = db.query(Department).get(department_id)
-
-        if not department:
-            return None
-        result = {
-            'department': department,
-            'employees': [],
-            'children': cls.get_children_tree(db, department_id, depth),
-        }
-        if include_employees:
-            result['employees'] = db.query(Employee).filter(Employee.department_id == department_id).all()
-        return result
-
-                
+        full_name: str,
+        position: str,
+        hired_at: date,
+    ) -> Employee:
+        pass
