@@ -2,16 +2,16 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.core.config import settings
 # from app.routes.posts import router as posts_router
-# from app.core.database import Base, async_engine
+from app.core.database import Base, engine
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with async_engine.begin() as conn:
+    async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
     yield
-    await async_engine.dispose()
+    await engine.dispose()
 
 
 app = FastAPI(

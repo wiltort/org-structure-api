@@ -11,13 +11,17 @@ class Settings(BaseSettings):
     app_name: str = "Org Structure API"
     app_description: str = "API for org structure management"
 
-    database_url: str = "postgresql://postgres_user:postgres_password@localhost:5432/blog_db"
-    redis_url: str = "redis://localhost:6379/0"
-    test_redis_url: str = "redis://localhost:6379/1"
-
-    cache_ttl: int = 3600  # время жизни кеша
+    db_name: str = "org_structure_db"
+    db_user: str = "postgres"
+    db_password: str = "postgres"
+    db_host: str = "localhost"
+    db_port: int = 5432
 
     model_config = SettingsConfigDict(env_file=str(BASE_DIR / ".env"), extra="ignore")
+
+    @property
+    def database_url(self) -> str:
+        return f"postgresql+psycopg2://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
 
 settings = Settings()  # type: ignore
