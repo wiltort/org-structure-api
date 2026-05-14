@@ -19,12 +19,12 @@ class Department(Base):
     children: Mapped[list["Department"]] = relationship(
         "Department",
         back_populates="parent",
-        cascade="all, delete_orphan"
+        cascade="all, delete-orphan"
     )
     employees: Mapped[list["Employee"]] = relationship(
         "Employee",
         back_populates="department",
-        cascade="all, delete_orphan"
+        cascade="all, delete-orphan"
     )
 
     __table_args__ = (
