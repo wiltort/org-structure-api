@@ -16,8 +16,16 @@ class Department(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
     parent: Mapped["Department | None"] = relationship("Department", remote_side=[id], back_populates="children")
-    children: Mapped[list["Department"]] = relationship("Department", back_populates="parent")
-    employees: Mapped[list["Employee"]] = relationship("Employee", back_populates="department")
+    children: Mapped[list["Department"]] = relationship(
+        "Department",
+        back_populates="parent",
+        cascade="all, delete_orphan"
+    )
+    employees: Mapped[list["Employee"]] = relationship(
+        "Employee",
+        back_populates="department",
+        cascade="all, delete_orphan"
+    )
 
     __table_args__ = (
         Index("ix_departments_parent_id_name", "parent_id", "name", unique=True),

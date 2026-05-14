@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 from datetime import datetime, date
+from enum import Enum
 
 
-class DepartamentBase(BaseModel):
+class DepartmentBase(BaseModel):
     """Базовая схема подразделения."""
 
     name: str = Field(
@@ -12,7 +13,7 @@ class DepartamentBase(BaseModel):
     )
 
 
-class DepartmentCreate(DepartamentBase):
+class DepartmentCreate(DepartmentBase):
     """Схема для создания нового подразделения."""
 
     parent_id: int | None = Field(
@@ -35,7 +36,7 @@ class DepartmentCreate(DepartamentBase):
     )
 
 
-class DepartamentUpdate(BaseModel):
+class DepartmentUpdate(BaseModel):
     """Схема для изменения подразделения."""
     name: str | None = Field(
         None,
@@ -69,7 +70,7 @@ class DepartamentUpdate(BaseModel):
         }
     )
 
-class DepartamentResponse(DepartamentBase):
+class DepartmentResponse(DepartmentBase):
     """Схема подразделения для API ответа."""
     
     id: int = Field(description="ID подразделения")
@@ -87,6 +88,7 @@ class DepartamentResponse(DepartamentBase):
             },
         },
     )
+
 
 class EmployeeBase(BaseModel):
     """Базовая схема для сотрудника."""
@@ -197,3 +199,27 @@ class EmployeeResponse(EmployeeBase):
             },
         },
     )
+
+class DepartmentTreeResponse(DepartmentResponse):
+    """Схема дерева подразделения для API ответа."""
+    children: list['DepartmentTreeResponse'] = Field(
+        default_factory=list,
+        description="Дочерние подразделения",
+    )
+    employees: list[EmployeeResponse] = Field(
+        default_factory=list,
+        description="Сотрудники",
+    )
+
+
+class DepartmentTreeRequest(BaseModel):
+    depth: int = Field(1, le=5, ge=1, description="Глубина вложенности")
+    include_employees: bool = Field(True, description="Включая сотрудников")
+
+DepartmentTreeResponse.model_rebuild()
+
+class ModeEnum(str, Enum):
+    """Схема для выбора режима."""
+
+    CASCADE = "cascade"
+    REASSIGN = "reassign"
