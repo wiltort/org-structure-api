@@ -59,11 +59,6 @@ class DepartmentUpdate(BaseModel):
             return v
         raise ValueError("name cannot be empty or contain only spaces")
     
-    @model_validator(mode="after")
-    def validate_parent_id(self):
-        if self.parent_id is not None and self.id == self.parent_id:
-            raise ValueError("parent_id cannot be equal to id")
-    
     model_config = ConfigDict(
         json_schema_extra={
             "example": {"name": "Магазин №1", "parent_id": 1}
