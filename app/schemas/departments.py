@@ -112,10 +112,6 @@ class EmployeeBase(BaseModel):
 class EmployeeCreate(EmployeeBase):
     """Схема для создания сотрудника."""
 
-    department_id: int = Field(
-        description="ID подразделения",
-    )
-
     @field_validator("full_name", "position")
     @classmethod
     def validate_nonempty_string(cls, v: str) -> str:
@@ -210,11 +206,46 @@ class DepartmentTreeResponse(DepartmentResponse):
         default_factory=list,
         description="Сотрудники",
     )
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "name": "Отдел 1",
+                "parent_id": None,
+                "children": [
+                    {
+                        "id": 2,
+                        "name": "Отдел 2",
+                        "parent_id": 1,
+                    },
+                ],
+                "employees": [
+                    {
+                        "id": 1,
+                        "full_name": "Иванов Иван Иванович",
+                        "position": "Менеджер",
+                        "hired_at": "2026-01-01",
+                        "department_id": 1,
+                    },
+                ],
+            },
+        },
+    )
 
 
 class DepartmentTreeRequest(BaseModel):
     depth: int = Field(1, le=5, ge=1, description="Глубина вложенности")
     include_employees: bool = Field(True, description="Включая сотрудников")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "depth": 1,
+                "include_employees": True,
+            },
+        },
+    )
 
 DepartmentTreeResponse.model_rebuild()
 
@@ -223,3 +254,23 @@ class ModeEnum(str, Enum):
 
     CASCADE = "cascade"
     REASSIGN = "reassign"
+
+class DepartmentDeleteRequest(BaseModel):
+    """Схема для удаления подразделения."""
+
+    mode: ModeEnum = Field(ModeEnum.CASCADE, description="Режим удаления")
+    reassign_to_department_id: int | None = Field(None, description="ID подразделения для переназначения")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "mode": "cascade",
+                "reassign_to_department_id": 1,
+            },
+        },
+    )
+
+    @model_validator(mode='after')
+    def validate_reassign_to_department_id(self):
+        if self.mode == ModeEnum.REASSIGN and self.reassign_to_department_id is None:
+            raise ValueError("reassign_to_department_id is required for reassign mode")

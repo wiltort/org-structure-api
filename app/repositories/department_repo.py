@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.departments import Department, Employee
 from datetime import date
 
-class DepartamentRepository:
+class DepartmentRepository:
     """Репозиторий для работы с моделями Departament."""
 
     @staticmethod

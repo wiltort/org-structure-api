@@ -57,16 +57,21 @@ class DepartmentService:
     @staticmethod
     def add_employee(
         db: Session,
+        department_id: int,
         employee: EmployeeCreate
     ) -> EmployeeResponse | None:
-        department = DepartmentRepository.get_by_id(db, employee.department_id)
+        department = DepartmentRepository.get_by_id(db, department_id)
         if not department:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Department not found"
             )
         try:
-            employee = DepartmentRepository.add_employee(db, **employee.model_dump())
+            employee = DepartmentRepository.add_employee(
+                db, 
+                department_id=department_id, 
+                **employee.model_dump()
+            )
         except IntegrityError as e:
             db.rollback()
             logger.error(f"IntegrityError: {e}")

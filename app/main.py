@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.core.config import settings
-from app.routes.posts import router as posts_router
+from app.routes.departments import router as main_router
 from app.core.database import Base, engine
 
 
@@ -24,7 +24,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.include_router(posts_router)
+app.include_router(main_router)
 
 
 @app.get("/")
