@@ -8,6 +8,7 @@ from app.schemas.departments import (
     EmployeeResponse,
     EmployeeCreate,
     DepartmentTreeRequest,
+    DepartmentDeleteRequest,
 )
 from app.services.departaments import DepartmentService
 
@@ -36,6 +37,6 @@ def get_tree(
     return DepartmentService.get_tree_and_employees(db, department_id, **request.model_dump())
 
 @router.delete("/{department_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_department(department_id: int, request: DepartmentTreeRequest,
+def delete_department(department_id: int, request: DepartmentDeleteRequest,
                       db: Session = Depends(get_db)):
     return DepartmentService.delete(db, department_id, **request.model_dump())

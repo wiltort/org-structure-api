@@ -264,7 +264,7 @@ class DepartmentDeleteRequest(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
-                "mode": "cascade",
+                "mode": "reassign",
                 "reassign_to_department_id": 1,
             },
         },
