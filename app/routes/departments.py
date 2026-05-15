@@ -9,6 +9,7 @@ from app.schemas.departments import (
     EmployeeCreate,
     DepartmentTreeRequest,
     DepartmentDeleteRequest,
+    DepartmentUpdate,
 )
 from app.services.departaments import DepartmentService
 
@@ -40,3 +41,9 @@ def get_tree(
 def delete_department(department_id: int, request: DepartmentDeleteRequest,
                       db: Session = Depends(get_db)):
     return DepartmentService.delete(db, department_id, **request.model_dump())
+
+
+@router.patch("/{department_id}", status_code=status.HTTP_200_OK)
+def update_department(department_id: int, department: DepartmentUpdate,
+                      db: Session = Depends(get_db)) -> DepartmentResponse:
+    return DepartmentService.update(db, department_id, department)
