@@ -28,7 +28,7 @@ API доступно по адресу: `http://localhost:8000`
 ## Тесты
 
 ```bash
-docker-compose exec api pytest
+docker-compose exec app pytest
 ```
 
 ## OpenAPI
